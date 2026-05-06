@@ -11,6 +11,7 @@ const state = {
   filteredClaims: [],
   sessionUser: null,
   isAdmin: false,
+  authCheckToken: 0,
 };
 
 const elements = {
@@ -172,31 +173,50 @@ async function checkAdminAccess() {
     return;
   }
 
-  const { data, error } = await supabase.rpc("is_admin");
+  const authCheckToken = state.authCheckToken;
 
-  if (error) {
-    setStatus(elements.emailStatus, humanizeSupabaseError(error), "error");
-    return;
-  }
+  try {
+    const { data, error } = await supabase.rpc("is_admin", {});
 
-  state.isAdmin = Boolean(data);
-  updateAuthUi();
+    if (authCheckToken !== state.authCheckToken) {
+      return;
+    }
 
-  if (!state.isAdmin) {
+    if (error) {
+      setStatus(elements.emailStatus, humanizeSupabaseError(error), "error");
+      return;
+    }
+
+    state.isAdmin = Boolean(data);
+    updateAuthUi();
+
+    if (!state.isAdmin) {
+      setStatus(
+        elements.emailStatus,
+        `La sesion de ${state.sessionUser.email} esta activa, pero ese correo no tiene permisos de administrador.`,
+        "warning",
+      );
+      return;
+    }
+
+    elements.adminUserLabel.textContent = `Administrador: ${state.sessionUser.email}`;
+    setStatus(elements.emailStatus, "Acceso administrador aprobado.", "success");
+    await fetchClaims();
+  } catch (error) {
+    if (authCheckToken !== state.authCheckToken) {
+      return;
+    }
+
     setStatus(
       elements.emailStatus,
-      "Este correo no esta autorizado en la tabla admin_users.",
-      "warning",
+      humanizeSupabaseError(error),
+      "error",
     );
-    return;
   }
-
-  elements.adminUserLabel.textContent = `Administrador: ${state.sessionUser.email}`;
-  setStatus(elements.emailStatus, "Acceso administrador aprobado.", "success");
-  await fetchClaims();
 }
 
 async function syncSession(session) {
+  state.authCheckToken += 1;
   state.sessionUser = session?.user || null;
 
   if (!state.sessionUser) {
@@ -237,7 +257,15 @@ async function signInWithPassword(event) {
   }
 
   setStatus(elements.emailStatus, "Sesion iniciada. Verificando permisos...", "info");
-  await syncSession(data.session);
+
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+  if (sessionError) {
+    setStatus(elements.emailStatus, humanizeSupabaseError(sessionError), "error");
+    return;
+  }
+
+  await syncSession(sessionData.session || data.session);
 }
 
 async function markClaimAsRedeemed(claimId) {
