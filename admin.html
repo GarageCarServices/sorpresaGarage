@@ -57,15 +57,6 @@
           <span class="panel-pill" id="admin-auth-pill">Pendiente</span>
         </div>
 
-        <button class="button button-google" id="admin-google-auth-button" type="button">
-          <span class="google-mark">G</span>
-          Continuar con Google
-        </button>
-
-        <div class="auth-divider">
-          <span>o</span>
-        </div>
-
         <form id="admin-login-form" class="stack-form">
           <label class="field">
             <span>Correo de administrador</span>
@@ -93,6 +84,11 @@
 
           <button class="button button-primary" type="submit">Iniciar sesion</button>
         </form>
+
+        <p class="auth-helper">
+          El correo debe existir en Supabase Authentication y tambien estar autorizado en la
+          tabla <code>admin_users</code>.
+        </p>
 
         <div class="status-banner" id="admin-email-status" aria-live="polite"></div>
         <button

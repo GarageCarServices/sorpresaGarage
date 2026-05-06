@@ -47,15 +47,16 @@ Landing estatica pensada para GitHub Pages con backend en Supabase:
 
 1. Crea el proyecto en Supabase.
 2. Ejecuta completo [schema.sql](./supabase/schema.sql) desde `SQL Editor`.
-3. En `Authentication > Providers`, habilita los proveedores del admin:
-   - `Google`
+3. En `Authentication > Providers`, habilita para el admin solo:
    - `Email`
 4. En `Authentication > URL Configuration`, agrega estas URLs:
    - `https://TU-USUARIO.github.io/TU-REPO/`
    - `https://TU-USUARIO.github.io/TU-REPO/index.html`
    - `https://TU-USUARIO.github.io/TU-REPO/admin.html`
-5. Copia tu `Project URL` y tu `anon public key`.
-6. Edita [config.js](./config.js) con esos valores.
+5. Crea el usuario administrador en `Authentication > Users` con correo y contrasena.
+6. Autoriza ese mismo correo en la tabla `public.admin_users`.
+7. Copia tu `Project URL` y tu `anon public key`.
+8. Edita [config.js](./config.js) con esos valores.
 
 ## 4. Fechas ya validadas
 

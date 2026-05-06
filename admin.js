@@ -1,5 +1,4 @@
 import {
-  buildAppUrl,
   formatDateTime,
   humanizeSupabaseError,
   isSupabaseConfigured,
@@ -16,7 +15,6 @@ const state = {
 
 const elements = {
   authPill: document.querySelector("#admin-auth-pill"),
-  googleButton: document.querySelector("#admin-google-auth-button"),
   loginForm: document.querySelector("#admin-login-form"),
   emailInput: document.querySelector("#admin-email-input"),
   passwordInput: document.querySelector("#admin-password-input"),
@@ -211,33 +209,6 @@ async function syncSession(session) {
   await checkAdminAccess();
 }
 
-async function signInWithGoogle() {
-  if (!isSupabaseConfigured || !supabase) {
-    setStatus(
-      elements.emailStatus,
-      "Configura primero Supabase en config.js para activar el panel real.",
-      "warning",
-    );
-    return;
-  }
-
-  setStatus(elements.emailStatus, "Redirigiendo a Google...", "info");
-
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: buildAppUrl("admin.html"),
-      queryParams: {
-        prompt: "select_account",
-      },
-    },
-  });
-
-  if (error) {
-    setStatus(elements.emailStatus, humanizeSupabaseError(error), "error");
-  }
-}
-
 async function signInWithPassword(event) {
   event.preventDefault();
 
@@ -255,7 +226,7 @@ async function signInWithPassword(event) {
 
   setStatus(elements.emailStatus, "Iniciando sesion...", "info");
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -265,7 +236,8 @@ async function signInWithPassword(event) {
     return;
   }
 
-  setStatus(elements.emailStatus, "Sesion iniciada.", "success");
+  setStatus(elements.emailStatus, "Sesion iniciada. Verificando permisos...", "info");
+  await syncSession(data.session);
 }
 
 async function markClaimAsRedeemed(claimId) {
@@ -306,7 +278,6 @@ async function signOut() {
 }
 
 function bindEvents() {
-  elements.googleButton.addEventListener("click", signInWithGoogle);
   elements.loginForm.addEventListener("submit", signInWithPassword);
   elements.searchInput.addEventListener("input", applySearchFilter);
   elements.refreshButton.addEventListener("click", fetchClaims);
