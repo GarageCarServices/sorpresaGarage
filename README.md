@@ -103,11 +103,31 @@ La landing llama una `Edge Function` de Supabase despues del registro:
 
 - `send-claim-email`
 
-### Servicio recomendado
+### Opcion A: Gmail sin dominio propio
 
-Te recomiendo usar `Resend` porque es rapido de integrar con Supabase Functions.
+Si no tienes dominio propio, puedes usar la cuenta `ventas.garagecarservices@gmail.com`
+con `Google Apps Script`.
 
-### Variables de entorno que debes crear en Supabase
+1. Abre `script.google.com`.
+2. Crea un proyecto nuevo.
+3. Copia el contenido de [google-apps-script.gs](./supabase/functions/send-claim-email/google-apps-script.gs).
+4. Reemplaza `WEBHOOK_SECRET` por una cadena larga y privada.
+5. Despliega como app web:
+   - `Deploy > New deployment`
+   - tipo: `Web app`
+   - ejecutar como: `Me`
+   - acceso: `Anyone`
+6. Copia la URL publicada.
+7. En `Supabase > Edge Functions > Secrets`, crea:
+
+```text
+GOOGLE_APPS_SCRIPT_WEBHOOK_URL=tu_url_publicada_de_apps_script
+GOOGLE_APPS_SCRIPT_SHARED_SECRET=el_mismo_secreto_que_pegaste_en_apps_script
+```
+
+### Opcion B: Resend con dominio propio
+
+Si despues compras un dominio, puedes volver a la opcion mas robusta con Resend:
 
 ```text
 RESEND_API_KEY=tu_api_key
@@ -116,11 +136,18 @@ CLAIM_EMAIL_FROM=Garage Car Services <promos@tudominio.com>
 
 ### Desplegar la funcion
 
+La funcion `send-claim-email` ya soporta ambos caminos:
+
+- Gmail por `Google Apps Script`
+- Resend con dominio propio
+
 Si tienes Supabase CLI:
 
 ```bash
 supabase functions deploy send-claim-email
 ```
+
+Si no tienes CLI, puedes desplegarla desde `Supabase > Edge Functions` usando el editor.
 
 La funcion:
 
@@ -128,6 +155,8 @@ La funcion:
 - busca el registro con service role
 - evita enviar el correo dos veces
 - envia confirmacion, terminos y forma de canje
+- usa Gmail si existe `GOOGLE_APPS_SCRIPT_WEBHOOK_URL`
+- si no, usa Resend
 
 ## 9. Publicacion en GitHub Pages
 

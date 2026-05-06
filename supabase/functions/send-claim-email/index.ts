@@ -9,6 +9,9 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const CLAIM_EMAIL_FROM = Deno.env.get("CLAIM_EMAIL_FROM") ?? "";
+const GOOGLE_APPS_SCRIPT_WEBHOOK_URL = Deno.env.get("GOOGLE_APPS_SCRIPT_WEBHOOK_URL") ?? "";
+const GOOGLE_APPS_SCRIPT_SHARED_SECRET =
+  Deno.env.get("GOOGLE_APPS_SCRIPT_SHARED_SECRET") ?? "";
 
 function htmlTemplate(claim: Record<string, string>) {
   return `
@@ -60,6 +63,71 @@ function htmlTemplate(claim: Record<string, string>) {
   `;
 }
 
+function emailSubject() {
+  return "Garage Car Services - Tu registro fue confirmado";
+}
+
+async function sendWithResend(claim: Record<string, string>) {
+  if (!RESEND_API_KEY || !CLAIM_EMAIL_FROM) {
+    throw new Error("RESEND_NOT_CONFIGURED");
+  }
+
+  const resendResponse = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: CLAIM_EMAIL_FROM,
+      to: [claim.email],
+      subject: emailSubject(),
+      html: htmlTemplate(claim),
+    }),
+  });
+
+  if (!resendResponse.ok) {
+    throw new Error(await resendResponse.text());
+  }
+}
+
+async function sendWithGoogleAppsScript(claim: Record<string, string>) {
+  if (!GOOGLE_APPS_SCRIPT_WEBHOOK_URL || !GOOGLE_APPS_SCRIPT_SHARED_SECRET) {
+    throw new Error("GMAIL_WEBHOOK_NOT_CONFIGURED");
+  }
+
+  const response = await fetch(GOOGLE_APPS_SCRIPT_WEBHOOK_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      secret: GOOGLE_APPS_SCRIPT_SHARED_SECRET,
+      to: claim.email,
+      subject: emailSubject(),
+      html: htmlTemplate(claim),
+      claim,
+    }),
+  });
+
+  const rawText = await response.text();
+  let payload: Record<string, unknown> | null = null;
+
+  try {
+    payload = rawText ? JSON.parse(rawText) : null;
+  } catch (_error) {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(rawText || "GMAIL_WEBHOOK_FAILED");
+  }
+
+  if (payload && payload.ok === false) {
+    throw new Error(String(payload.error || "GMAIL_WEBHOOK_FAILED"));
+  }
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -72,7 +140,10 @@ Deno.serve(async (request) => {
     });
   }
 
-  if (!RESEND_API_KEY || !CLAIM_EMAIL_FROM) {
+  if (
+    !GOOGLE_APPS_SCRIPT_WEBHOOK_URL &&
+    (!RESEND_API_KEY || !CLAIM_EMAIL_FROM)
+  ) {
     return new Response(JSON.stringify({ error: "Email service not configured" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -110,24 +181,14 @@ Deno.serve(async (request) => {
     });
   }
 
-  const resendResponse = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: CLAIM_EMAIL_FROM,
-      to: [claim.email],
-      subject: "Garage Car Services - Tu registro fue confirmado",
-      html: htmlTemplate(claim),
-    }),
-  });
-
-  if (!resendResponse.ok) {
-    const resendError = await resendResponse.text();
-
-    return new Response(JSON.stringify({ error: resendError }), {
+  try {
+    if (GOOGLE_APPS_SCRIPT_WEBHOOK_URL) {
+      await sendWithGoogleAppsScript(claim);
+    } else {
+      await sendWithResend(claim);
+    }
+  } catch (error) {
+    return new Response(JSON.stringify({ error: String(error) }), {
       status: 502,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
