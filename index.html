@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Promocion Garage Car Services para registrar participantes y activar un 10% de descuento en mano de obra."
+    />
+    <title>Garage Car Services | Premiacion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="claim">
+    <div class="intro-overlay" id="intro-overlay" aria-hidden="true">
+      <div class="intro-grid"></div>
+      <div class="intro-beam intro-beam-left"></div>
+      <div class="intro-beam intro-beam-right"></div>
+      <div class="intro-content">
+        <img
+          class="intro-logo"
+          src="./assets/garage-logo.png"
+          alt="Garage Car Services"
+        />
+        <p class="intro-kicker">Premiacion exclusiva</p>
+        <h1 class="intro-title">Sorpresa</h1>
+        <p class="intro-copy">Hay un beneficio reservado para ti.</p>
+        <button class="button button-primary intro-button" id="dismiss-intro-button" type="button">
+          Descubrir mi premio
+        </button>
+      </div>
+    </div>
+
+    <div class="page-noise" aria-hidden="true"></div>
+    <div class="page-glow page-glow-left" aria-hidden="true"></div>
+    <div class="page-glow page-glow-right" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brandmark" href="#hero">
+        <img
+          class="brandmark-logo"
+          src="./assets/garage-logo.png"
+          alt="Garage Car Services"
+        />
+        <div class="brandmark-copy">
+          <span class="brandmark-kicker">Promocion QR</span>
+          <span class="brandmark-name">Garage Car Services</span>
+        </div>
+      </a>
+      <nav class="topbar-actions">
+        <a class="button button-ghost" href="./admin.html">Acceso administrador</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="hero">
+        <div class="hero-copy reveal">
+          <span class="eyebrow">Beneficio activado por QR</span>
+          <h1>
+            Sorpresa, te has ganado
+            <span>10% de descuento en mano de obra</span>
+            para tu proximo mantenimiento automotriz.
+          </h1>
+          <p class="hero-text">
+            Valida la clave de tu QR y, si sigue disponible, completa tu registro para
+            reservar el beneficio.
+          </p>
+
+          <div class="offer-pills">
+            <span class="offer-pill" id="registration-deadline-pill"></span>
+            <span class="offer-pill offer-pill-alt" id="redemption-deadline-pill"></span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#claim-shell">Reclamar descuento</a>
+            <button class="button button-secondary" id="replay-intro-button" type="button">
+              Ver sorpresa otra vez
+            </button>
+          </div>
+        </div>
+
+        <div class="hero-stage reveal reveal-delay">
+          <div class="hero-stage-halo"></div>
+          <div class="spark-field" aria-hidden="true">
+            <span class="spark"></span>
+            <span class="spark"></span>
+            <span class="spark"></span>
+            <span class="spark"></span>
+            <span class="spark"></span>
+            <span class="spark"></span>
+            <span class="spark"></span>
+            <span class="spark"></span>
+          </div>
+          <div class="crest-shell">
+            <img
+              class="crest-logo"
+              src="./assets/garage-logo.png"
+              alt="Garage Car Services"
+            />
+          </div>
+          <div class="surprise-ticket">
+            <span>Premio QR</span>
+            <strong>10%</strong>
+            <p>Descuento valido en mano de obra</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="claim-shell" id="claim-shell">
+        <div class="section-head">
+          <span class="eyebrow">Activa tu premio</span>
+          <h2>Todo se abre por etapas para validar primero el QR.</h2>
+        </div>
+
+        <div class="registration-closed-banner" id="registration-closed-banner" hidden>
+          <strong>Registro cerrado.</strong>
+          <span id="registration-closed-copy"></span>
+        </div>
+
+        <div class="claim-layout">
+          <section class="panel panel-code">
+            <div class="panel-head">
+              <div>
+                <span class="panel-kicker">Paso 1</span>
+                <h3>Valida tu codigo</h3>
+              </div>
+              <span class="panel-pill" id="code-pill">Pendiente</span>
+            </div>
+
+            <p class="panel-note">
+              Si entraste desde el QR, la clave ya debe venir precargada. Aun asi, se
+              valida siempre en la base antes de permitir el registro.
+            </p>
+
+            <div class="detected-code" id="detected-code" hidden>
+              <p>Clave detectada desde el QR:</p>
+              <strong id="detected-code-value"></strong>
+            </div>
+
+            <form id="code-form" class="stack-form" autocomplete="off">
+              <label class="field">
+                <span>Codigo unico</span>
+                <input
+                  id="code-input"
+                  name="code"
+                  type="text"
+                  maxlength="32"
+                  placeholder="GARAGE-2026-001"
+                  required
+                />
+              </label>
+
+              <button class="button button-primary" id="validate-code-button" type="submit">
+                Validar codigo
+              </button>
+            </form>
+
+            <div class="status-banner" id="code-status" aria-live="polite"></div>
+          </section>
+
+          <div class="claim-panels">
+            <section class="panel panel-details" id="details-panel" hidden>
+              <div class="panel-head">
+                <div>
+                  <span class="panel-kicker">Paso 2</span>
+                  <h3>Completa tus datos</h3>
+                </div>
+                <span class="panel-pill panel-pill-muted" id="details-pill">Esperando validacion</span>
+              </div>
+
+              <div class="details-code-chip" id="details-code-chip" hidden>
+                <span>Codigo validado</span>
+                <strong id="details-code-value"></strong>
+              </div>
+
+              <form id="claim-form" class="stack-form" autocomplete="on" hidden>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Nombre</span>
+                    <input
+                      id="first-name"
+                      name="first_name"
+                      type="text"
+                      placeholder="Juan"
+                      autocomplete="given-name"
+                      required
+                    />
+                  </label>
+
+                  <label class="field">
+                    <span>Apellido</span>
+                    <input
+                      id="last-name"
+                      name="last_name"
+                      type="text"
+                      placeholder="Perez"
+                      autocomplete="family-name"
+                      required
+                    />
+                  </label>
+                </div>
+
+                <div class="field-grid">
+                  <label class="field">
+                    <span>DUI</span>
+                    <input
+                      id="dui"
+                      name="dui"
+                      type="text"
+                      inputmode="numeric"
+                      maxlength="10"
+                      placeholder="12345678-9"
+                      required
+                    />
+                  </label>
+
+                  <label class="field">
+                    <span>Correo electronico</span>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="cliente@correo.com"
+                      autocomplete="email"
+                      required
+                    />
+                  </label>
+                </div>
+
+                <label class="checkline">
+                  <input id="terms-checkbox" type="checkbox" required />
+                  <span>Acepto los terminos y condiciones de la promocion.</span>
+                </label>
+
+                <button class="button button-primary" id="claim-submit" type="submit" disabled>
+                  Confirmar mi registro
+                </button>
+              </form>
+
+              <div class="status-banner" id="claim-status" aria-live="polite"></div>
+            </section>
+
+            <section class="panel panel-success" id="registered-panel" hidden>
+              <div class="panel-head">
+                <div>
+                  <span class="panel-kicker">Registro completado</span>
+                  <h3>Tu descuento ya quedo reservado.</h3>
+                </div>
+                <span class="panel-pill panel-pill-success">Registrado</span>
+              </div>
+
+              <dl class="summary-grid" id="claim-summary"></dl>
+              <div class="status-banner" id="email-notification-status" aria-live="polite"></div>
+
+              <div class="success-actions">
+                <a class="button button-secondary" href="#terms-shell">Ver terminos</a>
+                <button class="button button-ghost" id="restart-flow-button" type="button">
+                  Registrar otro QR
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="terms-shell" id="terms-shell" hidden>
+        <div class="section-head">
+          <span class="eyebrow">Terminos y condiciones</span>
+          <h2>Condiciones oficiales de la promocion.</h2>
+        </div>
+
+        <article class="terms-card" id="terms-card">
+          <header class="terms-header">
+            <div class="terms-header-copy">
+              <img
+                class="terms-logo"
+                src="./assets/garage-logo.png"
+                alt="Garage Car Services"
+              />
+              <div>
+                <p class="terms-brand">Garage Car Services</p>
+                <h3>10% de descuento en mano de obra</h3>
+              </div>
+            </div>
+            <button class="button button-primary print-hide" id="print-terms-button" type="button">
+              Imprimir terminos
+            </button>
+          </header>
+
+          <div class="terms-personal-data" id="terms-personal-data"></div>
+
+          <ol class="terms-list">
+            <li>No aplica para servicios de cambio de aceite.</li>
+            <li>No aplica para servicios de limpieza de frenos.</li>
+            <li>
+              No aplica para servicios de limpieza de inyectores y descarbonizacion
+              de sistemas GDI, EFI y TSI.
+            </li>
+            <li>Fecha limite para registrarse: 16 de mayo de 2026, 11:59 p. m.</li>
+            <li>Fecha limite para utilizar el descuento: 31 de mayo de 2026.</li>
+            <li>El beneficio aplica una sola vez por participante y por codigo unico.</li>
+            <li>Para canjear el premio deberas presentar tu DUI y el correo registrado.</li>
+            <li>
+              El descuento queda sujeto a validacion interna y puede ser rechazado si
+              el beneficio ya fue canjeado o si los datos no coinciden.
+            </li>
+          </ol>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Garage Car Services - Promocion vigente hasta el 31 de mayo de 2026.</p>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
