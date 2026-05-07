@@ -85,7 +85,7 @@ input {
   transition:
     opacity 700ms ease,
     visibility 700ms ease;
-  animation: intro-auto-hide 3.2s forwards;
+  animation: intro-auto-hide 4.6s forwards;
 }
 
 .intro-overlay-hidden {
@@ -95,7 +95,7 @@ input {
 }
 
 .intro-overlay-replay {
-  animation: intro-auto-hide 3.2s forwards;
+  animation: intro-auto-hide 4.6s forwards;
 }
 
 .intro-grid,

@@ -288,7 +288,6 @@ function handleValidationResponse(result, code) {
   revealDetailsPanel(true);
   paintDetailsState("success", "Listo para datos");
   setStatus(elements.codeStatus, result.message || "QR valido. Ya puedes continuar.", "success");
-  elements.firstName.focus();
 }
 
 async function validateCode(event) {
@@ -471,7 +470,7 @@ async function init() {
   if (state.detectedCode) {
     window.setTimeout(() => {
       validateCode();
-    }, 450);
+    }, 5200);
   }
 
   if (!isSupabaseConfigured || !supabase) {
