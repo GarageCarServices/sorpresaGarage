@@ -306,7 +306,7 @@ input {
 }
 
 .button-ghost {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.12);
   border-color: var(--line);
 }
 
