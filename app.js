@@ -27,7 +27,6 @@ const state = {
 const elements = {
   introOverlay: document.querySelector("#intro-overlay"),
   dismissIntroButton: document.querySelector("#dismiss-intro-button"),
-  replayIntroButton: document.querySelector("#replay-intro-button"),
   registrationDeadlinePill: document.querySelector("#registration-deadline-pill"),
   redemptionDeadlinePill: document.querySelector("#redemption-deadline-pill"),
   closedBanner: document.querySelector("#registration-closed-banner"),
@@ -371,15 +370,8 @@ function dismissIntro() {
   elements.introOverlay.classList.add("intro-overlay-hidden");
 }
 
-function replayIntro() {
-  elements.introOverlay.classList.remove("intro-overlay-hidden", "intro-overlay-replay");
-  void elements.introOverlay.offsetWidth;
-  elements.introOverlay.classList.add("intro-overlay-replay");
-}
-
 function bindEvents() {
   elements.dismissIntroButton.addEventListener("click", dismissIntro);
-  elements.replayIntroButton.addEventListener("click", replayIntro);
   elements.codeForm.addEventListener("submit", validateCode);
   elements.claimForm.addEventListener("submit", submitClaim);
   elements.dui.addEventListener("input", () => {

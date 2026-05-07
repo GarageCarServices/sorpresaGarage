@@ -229,12 +229,6 @@ input {
   padding: 1.25rem 0 0;
 }
 
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
 .brandmark {
   display: inline-flex;
   align-items: center;
@@ -519,41 +513,6 @@ input {
   width: min(18rem, 80%);
   height: auto;
   filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.24));
-}
-
-.surprise-ticket {
-  position: absolute;
-  right: 0;
-  bottom: 1.6rem;
-  z-index: 2;
-  display: grid;
-  gap: 0.1rem;
-  min-width: 14rem;
-  padding: 1.15rem 1.2rem;
-  border-radius: 24px;
-  background:
-    linear-gradient(135deg, rgba(242, 229, 29, 0.98), rgba(255, 242, 98, 0.92));
-  color: #1a1804;
-  box-shadow: 0 24px 40px rgba(0, 0, 0, 0.28);
-}
-
-.surprise-ticket span {
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.74rem;
-  font-weight: 800;
-}
-
-.surprise-ticket strong {
-  font-family: var(--display-font);
-  font-size: 4.4rem;
-  line-height: 0.82;
-  letter-spacing: 0.04em;
-}
-
-.surprise-ticket p {
-  margin: 0;
-  font-weight: 700;
 }
 
 .claim-shell,
@@ -1093,13 +1052,6 @@ input {
     min-height: 28rem;
   }
 
-  .surprise-ticket {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    bottom: 0.8rem;
-  }
-
   .admin-toolbar,
   .terms-header,
   .topbar {
@@ -1109,7 +1061,6 @@ input {
 
 @media (max-width: 720px) {
   .topbar,
-  .topbar-actions,
   .hero-actions,
   .offer-pills,
   .field-grid,
@@ -1121,7 +1072,6 @@ input {
     display: grid;
   }
 
-  .topbar-actions,
   .hero-actions,
   .toolbar-actions,
   .success-actions {
