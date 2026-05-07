@@ -722,6 +722,16 @@ input {
   margin-top: 0.2rem;
 }
 
+.terms-consent {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.terms-preview-trigger {
+  justify-self: start;
+  font-weight: 700;
+}
+
 .status-banner {
   display: none;
   margin-top: 1rem;
@@ -855,6 +865,56 @@ input {
   margin: 1.5rem 0 0;
   padding-left: 1.2rem;
   line-height: 1.8;
+}
+
+.terms-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.terms-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 5, 4, 0.76);
+  backdrop-filter: blur(10px);
+}
+
+.terms-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(760px, 100%);
+  max-height: min(86vh, 920px);
+  padding: 1.5rem;
+  overflow: auto;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+}
+
+.terms-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.terms-modal-head h3 {
+  margin: 0.3rem 0 0;
+  font-size: 1.6rem;
+}
+
+.terms-modal-close {
+  flex: 0 0 auto;
+}
+
+.terms-modal-list {
+  margin-top: 1rem;
+}
+
+.modal-open {
+  overflow: hidden;
 }
 
 .site-footer {
@@ -1083,6 +1143,23 @@ input {
   .button-secondary,
   .button-ghost {
     width: 100%;
+  }
+
+  .terms-preview-trigger,
+  .terms-modal-close {
+    width: auto;
+  }
+
+  .terms-modal {
+    padding: 0.85rem;
+  }
+
+  .terms-modal-dialog {
+    padding: 1.15rem;
+  }
+
+  .terms-modal-head {
+    display: grid;
   }
 
   .brandmark {

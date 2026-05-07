@@ -24,6 +24,7 @@ const state = {
   detectedCode: getSecretCodeFromUrl(),
   validatedCode: "",
   claim: null,
+  modalTrigger: null,
 };
 
 const elements = {
@@ -48,12 +49,17 @@ const elements = {
   whatsapp: document.querySelector("#whatsapp"),
   email: document.querySelector("#email"),
   termsCheckbox: document.querySelector("#terms-checkbox"),
+  viewTermsButton: document.querySelector("#view-terms-button"),
   claimSubmit: document.querySelector("#claim-submit"),
   claimStatus: document.querySelector("#claim-status"),
   registeredPanel: document.querySelector("#registered-panel"),
   claimSummary: document.querySelector("#claim-summary"),
   termsShell: document.querySelector("#terms-shell"),
+  termsList: document.querySelector("#terms-card .terms-list"),
   termsPersonalData: document.querySelector("#terms-personal-data"),
+  termsModal: document.querySelector("#terms-modal"),
+  termsModalList: document.querySelector("#terms-modal-list"),
+  closeTermsModalButton: document.querySelector("#close-terms-modal-button"),
   printTermsButton: document.querySelector("#print-terms-button"),
   emailNotificationStatus: document.querySelector("#email-notification-status"),
   restartFlowButton: document.querySelector("#restart-flow-button"),
@@ -151,6 +157,38 @@ function renderClaimSummary(claim) {
       `,
     )
     .join("");
+}
+
+function syncTermsModalContent() {
+  if (!elements.termsList || !elements.termsModalList) {
+    return;
+  }
+
+  elements.termsModalList.innerHTML = elements.termsList.innerHTML;
+}
+
+function openTermsModal(trigger = null) {
+  if (!elements.termsModal) {
+    return;
+  }
+
+  state.modalTrigger = trigger || document.activeElement;
+  elements.termsModal.hidden = false;
+  elements.termsModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  elements.closeTermsModalButton?.focus();
+}
+
+function closeTermsModal() {
+  if (!elements.termsModal || elements.termsModal.hidden) {
+    return;
+  }
+
+  elements.termsModal.hidden = true;
+  elements.termsModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  state.modalTrigger?.focus?.();
+  state.modalTrigger = null;
 }
 
 function showClaimSuccess(claim) {
@@ -382,9 +420,23 @@ function dismissIntro() {
   elements.introOverlay.classList.add("intro-overlay-hidden");
 }
 
+function handleGlobalKeydown(event) {
+  if (event.key === "Escape") {
+    closeTermsModal();
+  }
+}
+
 function bindEvents() {
   elements.dismissIntroButton.addEventListener("click", dismissIntro);
   elements.claimForm.addEventListener("submit", submitClaim);
+  elements.viewTermsButton.addEventListener("click", (event) => openTermsModal(event.currentTarget));
+  elements.closeTermsModalButton.addEventListener("click", closeTermsModal);
+  elements.termsModal.addEventListener("click", (event) => {
+    if (event.target instanceof HTMLElement && event.target.dataset.closeTermsModal === "true") {
+      closeTermsModal();
+    }
+  });
+  document.addEventListener("keydown", handleGlobalKeydown);
   elements.dui.addEventListener("input", () => {
     elements.dui.value = normalizeDui(elements.dui.value);
     updateSubmitState();
@@ -406,6 +458,7 @@ function bindEvents() {
 }
 
 async function init() {
+  syncTermsModalContent();
   fillDetectedCode();
   updateDeadlineUi();
   bindEvents();

@@ -212,10 +212,19 @@
                   />
                 </label>
 
-                <label class="checkline">
-                  <input id="terms-checkbox" type="checkbox" required />
-                  <span>Acepto los terminos y condiciones de la promocion.</span>
-                </label>
+                <div class="terms-consent">
+                  <label class="checkline">
+                    <input id="terms-checkbox" type="checkbox" required />
+                    <span>Acepto los terminos y condiciones de la promocion.</span>
+                  </label>
+                  <button
+                    class="text-link terms-preview-trigger"
+                    id="view-terms-button"
+                    type="button"
+                  >
+                    Ver terminos y condiciones
+                  </button>
+                </div>
 
                 <button class="button button-primary" id="claim-submit" type="submit" disabled>
                   Confirmar mi registro
@@ -292,6 +301,34 @@
           </ol>
         </article>
       </section>
+
+      <div class="terms-modal" id="terms-modal" hidden aria-hidden="true">
+        <div class="terms-modal-backdrop" data-close-terms-modal="true"></div>
+        <div
+          class="terms-modal-dialog panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="terms-modal-title"
+        >
+          <div class="terms-modal-head">
+            <div>
+              <span class="panel-kicker">Promocion</span>
+              <h3 id="terms-modal-title">Terminos y condiciones</h3>
+            </div>
+            <button
+              class="button button-ghost terms-modal-close"
+              id="close-terms-modal-button"
+              type="button"
+            >
+              Cerrar
+            </button>
+          </div>
+          <p class="panel-note">
+            Revisa las condiciones antes de confirmar tu registro.
+          </p>
+          <ol class="terms-list terms-modal-list" id="terms-modal-list"></ol>
+        </div>
+      </div>
     </main>
 
     <footer class="site-footer">
