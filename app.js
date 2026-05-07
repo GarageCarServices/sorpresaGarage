@@ -1,13 +1,16 @@
 import { appConfig } from "./config.js";
 import {
   disableForm,
+  formatWhatsAppDisplay,
   formatDateOnly,
   formatDateTime,
   getSecretCodeFromUrl,
+  isValidWhatsApp,
   humanizeSupabaseError,
   isRegistrationClosed,
   isSupabaseConfigured,
   isValidDui,
+  normalizeWhatsApp,
   normalizeDui,
   registrationDeadline,
   redemptionDeadline,
@@ -42,6 +45,7 @@ const elements = {
   firstName: document.querySelector("#first-name"),
   lastName: document.querySelector("#last-name"),
   dui: document.querySelector("#dui"),
+  whatsapp: document.querySelector("#whatsapp"),
   email: document.querySelector("#email"),
   termsCheckbox: document.querySelector("#terms-checkbox"),
   claimSubmit: document.querySelector("#claim-submit"),
@@ -118,6 +122,7 @@ function renderClaimSummary(claim) {
   const rows = [
     ["Participante", `${claim.first_name} ${claim.last_name}`],
     ["Correo", claim.email],
+    ["WhatsApp", formatWhatsAppDisplay(claim.whatsapp_phone)],
     ["DUI", claim.dui],
     ["Codigo aplicado", claim.claimed_code],
     ["Registrado", formatDateTime(claim.created_at)],
@@ -136,7 +141,7 @@ function renderClaimSummary(claim) {
     .join("");
 
   elements.termsPersonalData.innerHTML = rows
-    .slice(0, 5)
+    .slice(0, 6)
     .map(
       ([label, value]) => `
         <div>
@@ -180,6 +185,7 @@ function updateSubmitState() {
     elements.firstName.value.trim().length > 0 &&
     elements.lastName.value.trim().length > 0 &&
     isValidDui(normalizeDui(elements.dui.value)) &&
+    isValidWhatsApp(elements.whatsapp.value) &&
     emailPattern.test(elements.email.value.trim()) &&
     elements.termsCheckbox.checked;
 
@@ -311,6 +317,9 @@ async function submitClaim(event) {
   const lastName = elements.lastName.value.trim();
   const email = elements.email.value.trim().toLowerCase();
   const dui = normalizeDui(elements.dui.value);
+  const whatsapp = normalizeWhatsApp(elements.whatsapp.value);
+
+  elements.whatsapp.value = whatsapp;
 
   if (!emailPattern.test(email)) {
     setStatus(elements.claimStatus, "Ingresa un correo electronico valido.", "warning");
@@ -319,6 +328,15 @@ async function submitClaim(event) {
 
   if (!isValidDui(dui)) {
     setStatus(elements.claimStatus, "El DUI debe tener formato 12345678-9.", "warning");
+    return;
+  }
+
+  if (!isValidWhatsApp(whatsapp)) {
+    setStatus(
+      elements.claimStatus,
+      "El numero de WhatsApp debe tener formato 1234-5678 y comenzar con 5, 6 o 7.",
+      "warning",
+    );
     return;
   }
 
@@ -334,6 +352,7 @@ async function submitClaim(event) {
     p_first_name: firstName,
     p_last_name: lastName,
     p_dui: dui,
+    p_whatsapp_phone: whatsapp,
     p_email: email,
     p_code: state.validatedCode,
   });
@@ -368,6 +387,10 @@ function bindEvents() {
   elements.claimForm.addEventListener("submit", submitClaim);
   elements.dui.addEventListener("input", () => {
     elements.dui.value = normalizeDui(elements.dui.value);
+    updateSubmitState();
+  });
+  elements.whatsapp.addEventListener("input", () => {
+    elements.whatsapp.value = normalizeWhatsApp(elements.whatsapp.value);
     updateSubmitState();
   });
   [elements.firstName, elements.lastName, elements.email, elements.termsCheckbox].forEach((node) => {

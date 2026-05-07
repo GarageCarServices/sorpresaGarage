@@ -65,6 +65,42 @@ export function normalizeDui(value) {
   return `${digits.slice(0, 8)}-${digits.slice(8)}`;
 }
 
+export function normalizeWhatsApp(value) {
+  const digits = String(value || "")
+    .replace(/\D/g, "")
+    .slice(0, 8);
+
+  if (digits.length <= 4) {
+    return digits;
+  }
+
+  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+}
+
+export function getWhatsAppDigits(value) {
+  return String(value || "")
+    .replace(/\D/g, "")
+    .slice(0, 11);
+}
+
+export function isValidWhatsApp(value) {
+  const digits = getWhatsAppDigits(value);
+  const localDigits = digits.startsWith("503") && digits.length === 11 ? digits.slice(3) : digits;
+  return /^(?:5|6|7)\d{7}$/.test(localDigits);
+}
+
+export function formatWhatsAppDisplay(value, { includeCountryCode = false } = {}) {
+  const digits = getWhatsAppDigits(value);
+  const localDigits = digits.startsWith("503") && digits.length === 11 ? digits.slice(3) : digits;
+
+  if (!/^(?:5|6|7)\d{7}$/.test(localDigits)) {
+    return String(value || "");
+  }
+
+  const formatted = `${localDigits.slice(0, 4)}-${localDigits.slice(4)}`;
+  return includeCountryCode ? `+503 ${formatted}` : formatted;
+}
+
 export function isValidDui(value) {
   return /^\d{8}-\d$/.test(String(value || "").trim());
 }
@@ -156,6 +192,10 @@ export function humanizeSupabaseError(error) {
 
   if (source.includes("INVALID_DUI")) {
     return "El DUI no cumple con el formato esperado.";
+  }
+
+  if (source.includes("INVALID_WHATSAPP")) {
+    return "El numero de WhatsApp debe tener formato 1234-5678 y empezar con 5, 6 o 7.";
   }
 
   if (source.includes("INVALID_EMAIL")) {

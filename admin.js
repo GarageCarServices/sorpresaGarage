@@ -1,4 +1,5 @@
 import {
+  formatWhatsAppDisplay,
   formatDateTime,
   humanizeSupabaseError,
   isSupabaseConfigured,
@@ -86,6 +87,7 @@ function renderRows() {
           </td>
           <td class="contact-cell">
             <strong>${claim.email}</strong>
+            <span>WhatsApp: ${formatWhatsAppDisplay(claim.whatsapp_phone, { includeCountryCode: true })}</span>
             <span>${claim.redeemed_by_email ? `Canjeado por ${claim.redeemed_by_email}` : "Sin canje"}</span>
           </td>
           <td>
@@ -131,6 +133,7 @@ function applySearchFilter() {
       claim.first_name,
       claim.last_name,
       claim.email,
+      claim.whatsapp_phone,
       claim.dui,
       claim.claimed_code,
     ]
@@ -152,7 +155,9 @@ async function fetchClaims() {
 
   const { data, error } = await supabase
     .from("promotion_claims")
-    .select("id, first_name, last_name, email, dui, claimed_code, created_at, redeemed_at, redeemed_by_email")
+    .select(
+      "id, first_name, last_name, email, whatsapp_phone, dui, claimed_code, created_at, redeemed_at, redeemed_by_email",
+    )
     .order("created_at", { ascending: false });
 
   if (error) {

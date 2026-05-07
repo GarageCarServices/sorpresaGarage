@@ -3,8 +3,8 @@
 Landing estatica pensada para GitHub Pages con backend en Supabase:
 
 - landing sorpresa con entrada animada
-- validacion de QR/codigo como primer paso
-- formulario progresivo con nombre, apellido, DUI y correo
+- validacion automatica del QR como primer paso
+- formulario progresivo con nombre, apellido, DUI, WhatsApp y correo
 - bloqueo automatico de registros desde el 16 de mayo de 2026
 - terminos imprimibles
 - panel administrador con autenticacion
@@ -23,13 +23,14 @@ Landing estatica pensada para GitHub Pages con backend en Supabase:
 
 ## 1. Flujo publico actual
 
-1. La persona entra por QR o escribe el codigo manualmente.
-2. La pagina valida ese codigo en Supabase.
+1. La persona entra por un QR valido.
+2. La pagina detecta y valida ese QR en Supabase.
 3. Solo si el codigo sigue libre, se despliega el formulario.
 4. La persona completa:
    - nombre
    - apellido
    - DUI
+   - WhatsApp
    - correo electronico
 5. Al guardar, Supabase vuelve a validar el mismo codigo para evitar registros dobles.
 6. Si el registro se completa, se muestran terminos y se intenta enviar el correo.
@@ -41,12 +42,14 @@ Landing estatica pensada para GitHub Pages con backend en Supabase:
 - que el codigo no haya sido usado antes
 - que el registro siga abierto antes del 16 de mayo de 2026
 - que el DUI tenga formato valido
+- que el WhatsApp tenga formato valido
 - que el correo tenga formato valido
 
 ## 3. Configurar Supabase
 
 1. Crea el proyecto en Supabase.
 2. Ejecuta completo [schema.sql](./supabase/schema.sql) desde `SQL Editor`.
+   Ahí mismo se crea o actualiza la columna `public.promotion_claims.whatsapp_phone`.
 3. En `Authentication > Providers`, habilita para el admin solo:
    - `Email`
 4. En `Authentication > URL Configuration`, agrega estas URLs:
@@ -78,7 +81,7 @@ Ejemplo:
 https://tu-usuario.github.io/tu-repo/?code=GARAGE-2026-001
 ```
 
-La landing detecta `code`, lo precarga y lo valida antes de mostrar el formulario.
+La landing detecta `code` y lo valida antes de mostrar el formulario.
 
 ## 6. Cargar codigos secretos
 

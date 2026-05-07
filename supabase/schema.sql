@@ -27,6 +27,7 @@ create table if not exists public.promotion_claims (
   last_name text not null,
   dui text not null,
   dui_normalized text not null unique,
+  whatsapp_phone text,
   claimed_code text not null,
   promo_code_id uuid not null unique references public.promo_codes (id),
   terms_accepted_at timestamptz not null default now(),
@@ -44,6 +45,16 @@ alter table public.promotion_claims
 
 alter table public.promotion_claims
   add column if not exists notification_sent_at timestamptz;
+
+alter table public.promotion_claims
+  add column if not exists whatsapp_phone text;
+
+alter table public.promotion_claims
+  drop constraint if exists promotion_claims_whatsapp_phone_format;
+
+alter table public.promotion_claims
+  add constraint promotion_claims_whatsapp_phone_format
+  check (whatsapp_phone is null or whatsapp_phone ~ '^503[567][0-9]{7}$');
 
 alter table public.promo_codes
   drop constraint if exists promo_codes_claim_id_fkey;
@@ -77,11 +88,13 @@ as $$
 $$;
 
 drop function if exists public.claim_promotion(text, text, text, text);
+drop function if exists public.claim_promotion(text, text, text, text, text);
 
 create or replace function public.claim_promotion(
   p_first_name text,
   p_last_name text,
   p_dui text,
+  p_whatsapp_phone text,
   p_email text,
   p_code text
 )
@@ -95,6 +108,8 @@ declare
   v_claim public.promotion_claims%rowtype;
   v_dui_digits text := regexp_replace(trim(coalesce(p_dui, '')), '\D', '', 'g');
   v_dui_formatted text;
+  v_whatsapp_digits text := regexp_replace(trim(coalesce(p_whatsapp_phone, '')), '\D', '', 'g');
+  v_whatsapp_canonical text;
   v_email text := lower(trim(coalesce(p_email, '')));
   v_code_normalized text := upper(trim(coalesce(p_code, '')));
   v_registration_deadline constant timestamptz := timestamptz '2026-05-16 23:59:59-06';
@@ -113,6 +128,10 @@ begin
 
   if v_email = '' or v_email !~* '^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}$' then
     raise exception 'INVALID_EMAIL';
+  end if;
+
+  if v_whatsapp_digits !~ '^[567][0-9]{7}$' then
+    raise exception 'INVALID_WHATSAPP';
   end if;
 
   if v_code_normalized = '' then
@@ -143,6 +162,7 @@ begin
   end if;
 
   v_dui_formatted := substring(v_dui_digits from 1 for 8) || '-' || substring(v_dui_digits from 9 for 1);
+  v_whatsapp_canonical := '503' || v_whatsapp_digits;
 
   insert into public.promotion_claims (
     email,
@@ -151,6 +171,7 @@ begin
     last_name,
     dui,
     dui_normalized,
+    whatsapp_phone,
     claimed_code,
     promo_code_id
   )
@@ -161,6 +182,7 @@ begin
     trim(p_last_name),
     v_dui_formatted,
     v_dui_digits,
+    v_whatsapp_canonical,
     v_code_normalized,
     v_code.id
   )
@@ -304,5 +326,5 @@ grant select on public.promotion_claims to authenticated;
 grant select on public.admin_users to authenticated;
 grant execute on function public.validate_promo_code(text) to authenticated, anon;
 grant execute on function public.is_admin() to authenticated;
-grant execute on function public.claim_promotion(text, text, text, text, text) to authenticated, anon;
+grant execute on function public.claim_promotion(text, text, text, text, text, text) to authenticated, anon;
 grant execute on function public.redeem_promotion(uuid) to authenticated;

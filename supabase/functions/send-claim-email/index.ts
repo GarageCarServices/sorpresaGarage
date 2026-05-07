@@ -13,6 +13,17 @@ const GOOGLE_APPS_SCRIPT_WEBHOOK_URL = Deno.env.get("GOOGLE_APPS_SCRIPT_WEBHOOK_
 const GOOGLE_APPS_SCRIPT_SHARED_SECRET =
   Deno.env.get("GOOGLE_APPS_SCRIPT_SHARED_SECRET") ?? "";
 
+function formatWhatsApp(value: string) {
+  const digits = String(value || "").replace(/\D/g, "");
+  const localDigits = digits.startsWith("503") && digits.length === 11 ? digits.slice(3) : digits;
+
+  if (!/^[567]\d{7}$/.test(localDigits)) {
+    return value;
+  }
+
+  return `+503 ${localDigits.slice(0, 4)}-${localDigits.slice(4)}`;
+}
+
 function htmlTemplate(claim: Record<string, string>) {
   return `
     <div style="background:#07110d;padding:32px;font-family:Arial,sans-serif;color:#f5fbf7;">
@@ -33,6 +44,10 @@ function htmlTemplate(claim: Record<string, string>) {
             <div style="padding:14px;border-radius:16px;background:#0f241a;border:1px solid rgba(255,255,255,0.08);">
               <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#f2e51d;">DUI</p>
               <strong>${claim.dui}</strong>
+            </div>
+            <div style="padding:14px;border-radius:16px;background:#0f241a;border:1px solid rgba(255,255,255,0.08);">
+              <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#f2e51d;">WhatsApp</p>
+              <strong>${formatWhatsApp(claim.whatsapp_phone)}</strong>
             </div>
             <div style="padding:14px;border-radius:16px;background:#0f241a;border:1px solid rgba(255,255,255,0.08);">
               <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#f2e51d;">Codigo</p>
@@ -163,7 +178,7 @@ Deno.serve(async (request) => {
 
   const { data: claim, error: claimError } = await adminClient
     .from("promotion_claims")
-    .select("id, first_name, last_name, email, dui, claimed_code, notification_sent_at")
+    .select("id, first_name, last_name, email, dui, whatsapp_phone, claimed_code, notification_sent_at")
     .eq("id", claimId)
     .maybeSingle();
 
