@@ -8,7 +8,6 @@ import {
   isRegistrationClosed,
   isSupabaseConfigured,
   isValidDui,
-  normalizeCode,
   normalizeDui,
   registrationDeadline,
   redemptionDeadline,
@@ -32,9 +31,6 @@ const elements = {
   closedBanner: document.querySelector("#registration-closed-banner"),
   closedCopy: document.querySelector("#registration-closed-copy"),
   codePill: document.querySelector("#code-pill"),
-  codeForm: document.querySelector("#code-form"),
-  codeInput: document.querySelector("#code-input"),
-  validateCodeButton: document.querySelector("#validate-code-button"),
   codeStatus: document.querySelector("#code-status"),
   detectedCodeWrap: document.querySelector("#detected-code"),
   detectedCodeValue: document.querySelector("#detected-code-value"),
@@ -115,7 +111,6 @@ function fillDetectedCode() {
   }
 
   elements.detectedCodeValue.textContent = state.detectedCode;
-  elements.codeInput.value = state.detectedCode;
   elements.detectedCodeWrap.hidden = false;
 }
 
@@ -162,7 +157,7 @@ function showClaimSuccess(claim) {
   paintCodeState("success", "QR registrado");
 }
 
-function resetClaimView({ keepCode = true } = {}) {
+function resetClaimView() {
   state.claim = null;
   state.validatedCode = "";
   elements.registeredPanel.hidden = true;
@@ -174,13 +169,7 @@ function resetClaimView({ keepCode = true } = {}) {
   paintCodeState("warning", "Pendiente");
   paintDetailsState("info", "Esperando validacion");
   elements.claimSubmit.disabled = true;
-
-  if (!keepCode) {
-    elements.codeInput.value = "";
-    elements.detectedCodeWrap.hidden = true;
-  } else if (state.detectedCode) {
-    fillDetectedCode();
-  }
+  fillDetectedCode();
 }
 
 function updateSubmitState() {
@@ -232,7 +221,7 @@ function handleValidationResponse(result, code) {
     paintCodeState("warning", result?.reason === "already_used" ? "QR usado" : "No disponible");
     setStatus(
       elements.codeStatus,
-      result?.message || "No fue posible validar este codigo.",
+      result?.message || "No fue posible validar este QR.",
       result?.reason === "already_used" ? "error" : "warning",
     );
     return;
@@ -246,7 +235,7 @@ function handleValidationResponse(result, code) {
     paintDetailsState("info", "Registro cerrado");
     setStatus(
       elements.codeStatus,
-      "El codigo existe, pero el periodo de registro ya cerro.",
+      "El QR existe, pero el periodo de registro ya cerro.",
       "warning",
     );
     return;
@@ -254,7 +243,7 @@ function handleValidationResponse(result, code) {
 
   revealDetailsPanel(true);
   paintDetailsState("success", "Listo para datos");
-  setStatus(elements.codeStatus, result.message || "Codigo valido. Ya puedes continuar.", "success");
+  setStatus(elements.codeStatus, result.message || "QR valido. Ya puedes continuar.", "success");
   elements.firstName.focus();
 }
 
@@ -270,12 +259,16 @@ async function validateCode(event) {
     return;
   }
 
-  const code = normalizeCode(elements.codeInput.value);
-  elements.codeInput.value = code;
+  const code = state.detectedCode;
 
   if (!code) {
     resetClaimView();
-    setStatus(elements.codeStatus, "Ingresa o escanea una clave valida.", "warning");
+    paintCodeState("warning", "Sin QR");
+    setStatus(
+      elements.codeStatus,
+      "Este acceso solo funciona desde un QR valido. Escanea el codigo nuevamente.",
+      "warning",
+    );
     return;
   }
 
@@ -283,7 +276,7 @@ async function validateCode(event) {
     resetClaimView();
   }
 
-  setStatus(elements.codeStatus, "Validando codigo en la base...", "info");
+  setStatus(elements.codeStatus, "Validando QR en la base...", "info");
   paintCodeState("warning", "Validando");
 
   const { data, error } = await supabase.rpc("validate_promo_code", {
@@ -305,7 +298,7 @@ async function submitClaim(event) {
   event.preventDefault();
 
   if (!supabase || !state.validatedCode) {
-    setStatus(elements.claimStatus, "Primero debes validar el codigo del QR.", "warning");
+    setStatus(elements.claimStatus, "Primero debes abrir el enlace desde un QR valido.", "warning");
     return;
   }
 
@@ -372,7 +365,6 @@ function dismissIntro() {
 
 function bindEvents() {
   elements.dismissIntroButton.addEventListener("click", dismissIntro);
-  elements.codeForm.addEventListener("submit", validateCode);
   elements.claimForm.addEventListener("submit", submitClaim);
   elements.dui.addEventListener("input", () => {
     elements.dui.value = normalizeDui(elements.dui.value);
@@ -382,23 +374,11 @@ function bindEvents() {
     node.addEventListener("input", updateSubmitState);
     node.addEventListener("change", updateSubmitState);
   });
-  elements.codeInput.addEventListener("input", () => {
-    const normalized = normalizeCode(elements.codeInput.value);
-    elements.codeInput.value = normalized;
-
-    if (state.validatedCode && state.validatedCode !== normalized) {
-      state.validatedCode = "";
-      revealDetailsPanel(false);
-      paintCodeState("warning", "Pendiente");
-      paintDetailsState("info", "Esperando validacion");
-      setStatus(elements.claimStatus, "", "");
-    }
-  });
   elements.printTermsButton.addEventListener("click", () => window.print());
   elements.restartFlowButton.addEventListener("click", () => {
-    resetClaimView({ keepCode: false });
-    elements.codeInput.focus();
+    resetClaimView();
     window.location.hash = "claim-shell";
+    validateCode();
   });
 }
 

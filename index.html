@@ -116,38 +116,21 @@
             <div class="panel-head">
               <div>
                 <span class="panel-kicker">Paso 1</span>
-                <h3>Valida tu codigo</h3>
+                <h3>Valida tu QR</h3>
               </div>
               <span class="panel-pill" id="code-pill">Pendiente</span>
             </div>
 
             <p class="panel-note">
-              Si entraste desde el QR, la clave ya debe venir precargada. Aun asi, se
-              valida siempre en la base antes de permitir el registro.
+              Este acceso solo se habilita al abrir el enlace desde un QR valido. La
+              clave se detecta automaticamente y se valida en la base antes de permitir
+              el registro.
             </p>
 
             <div class="detected-code" id="detected-code" hidden>
               <p>Clave detectada desde el QR:</p>
               <strong id="detected-code-value"></strong>
             </div>
-
-            <form id="code-form" class="stack-form" autocomplete="off">
-              <label class="field">
-                <span>Codigo unico</span>
-                <input
-                  id="code-input"
-                  name="code"
-                  type="text"
-                  maxlength="32"
-                  placeholder="GARAGE-2026-001"
-                  required
-                />
-              </label>
-
-              <button class="button button-primary" id="validate-code-button" type="submit">
-                Validar codigo
-              </button>
-            </form>
 
             <div class="status-banner" id="code-status" aria-live="polite"></div>
           </section>
@@ -163,7 +146,7 @@
               </div>
 
               <div class="details-code-chip" id="details-code-chip" hidden>
-                <span>Codigo validado</span>
+                <span>QR validado</span>
                 <strong id="details-code-value"></strong>
               </div>
 
