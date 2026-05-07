@@ -876,6 +876,10 @@ input {
   padding: 1.25rem;
 }
 
+.terms-modal[hidden] {
+  display: none !important;
+}
+
 .terms-modal-backdrop {
   position: absolute;
   inset: 0;
