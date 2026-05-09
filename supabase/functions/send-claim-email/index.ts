@@ -87,6 +87,21 @@ function socialLinksMarkup() {
   ).join("");
 }
 
+function socialLinksListMarkup() {
+  return SOCIAL_LINKS.map(
+    ({ label, href }) => `
+      <li style="margin:0 0 8px;">
+        <a
+          href="${href}"
+          style="color:#9ef6c8;text-decoration:underline;word-break:break-word;"
+        >
+          ${label}: ${href}
+        </a>
+      </li>
+    `,
+  ).join("");
+}
+
 function htmlTemplate(claim: Record<string, string>) {
   return `
     <div style="background:#07110d;padding:32px;font-family:Arial,sans-serif;color:#f5fbf7;">
@@ -142,6 +157,12 @@ function htmlTemplate(claim: Record<string, string>) {
           <div style="margin:0 0 4px;">
             ${socialLinksMarkup()}
           </div>
+          <p style="margin:16px 0 8px;font-size:14px;line-height:1.7;color:#d6e5db;">
+            Si tu correo no muestra los botones correctamente, aqui tienes los enlaces directos:
+          </p>
+          <ul style="margin:0;padding-left:18px;line-height:1.8;color:#d6e5db;">
+            ${socialLinksListMarkup()}
+          </ul>
         </div>
       </div>
     </div>
