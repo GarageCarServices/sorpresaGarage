@@ -129,11 +129,20 @@ function htmlTemplate(claim: Record<string, string>) {
           <ul style="padding-left:18px;line-height:1.8;color:#d6e5db;">
             <li>No aplica para servicios de cambio de aceite.</li>
             <li>No aplica para servicios de limpieza de frenos.</li>
-            <li>No aplica para servicios de limpieza de inyectores y descarbonizacion de sistemas GDI, EFI y TSI.</li>
+            <li>El descuento no aplica en conjunto con otros descuentos o promociones.</li>
+            <li>
+            No aplica para servicios de limpieza de inyectores y descarbonizacion de sistemas GDI, EFI, 
+            FSI, TSI u otros sistemas relacionados.
+            </li>
+            <li>
+              El descuento no aplica en repuestos y tampoco el servicio de mano de obra incluye
+               los repuestos, esos deberán ser comprados por el cliente ya sea que el los compre
+               o que la compra la realice por medio del taller.
+            </li>
             <li>Fecha limite para registrarse: 16 de mayo de 2026.</li>
             <li>Fecha limite del descuento: 31 de mayo de 2026.</li>
           </ul>
-          <h2 style="margin:24px 0 12px;font-size:18px;">Mantente en contacto</h2>
+          <h2 style="margin:24px 0 12px;font-size:18px;">Síguenos en nuestras redes sociales:</h2>
           <p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#d6e5db;">
             Si necesitas ayuda, tambien puedes escribirnos o encontrarnos por estos canales:
           </p>
